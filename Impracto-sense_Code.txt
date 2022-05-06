@@ -1,0 +1,88 @@
+#include <LiquidCrystal.h>
+
+int light;
+int buzzer = 7;
+const int trigpin = 10;
+const double echopin = 9;
+unsigned long duration;
+int distance;
+float temp;
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() 
+{
+  lcd.begin(16, 2);
+  pinMode(trigpin,OUTPUT);
+  pinMode(echopin,INPUT);
+} 
+                                                                                             
+void loop()
+{
+  
+  light = analogRead(A0);
+  
+  light>300?DistanceSensor():TempeartureSensor();
+}
+
+void DistanceSensor()
+{
+  digitalWrite(trigpin,LOW);
+  delayMicroseconds(2);
+  
+  digitalWrite(trigpin,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigpin,LOW);
+  
+  duration = pulseIn(echopin,HIGH);  //return the total travel time
+  distance = duration* 0.01723;
+  if(distance<200)
+  {
+     buzz();
+     lcd.setCursor(0,0);
+     lcd.print("Too close!");
+     lcd.setCursor(0,1);
+     lcd.print(distance);
+  }
+
+  else
+  {
+    lcd.setCursor(0,0);
+    lcd.print("Safe Distance");
+    lcd.setCursor(0,1);
+    lcd.print(distance);
+  }
+    
+}
+
+void buzz()
+{
+  tone(buzzer,14000);
+  delay(500);
+  noTone(buzzer);
+}
+
+void TemperatureSensor()
+{
+  temp = analogRead(A1);
+  temp= temp/1024;
+  temp=temp*5;
+  temp=temp-0.5;
+  temp=temp*100;
+  if(temp>50)
+  {
+  	lcd.setCursor(0,0);
+  	lcd.print("Too Hot!,Stay Home");
+    lcd.setCursor(0,1);
+    lcd.print(temp);
+  }
+  else
+  {
+    lcd.setCursor(0,0);
+    lcd.print("You can go out");
+    lcd.setCursor(0,1);
+    lcd.print(temp);
+  }
+}
+   
+  
